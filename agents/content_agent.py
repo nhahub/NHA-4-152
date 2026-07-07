@@ -14,10 +14,7 @@ def build_offer_details(campaign: CampaignDetails) -> str:
     return f"""Title: {campaign["title"]}
 Description: {campaign["description"]}
 Target Audience: {campaign["target_audience"]}
-Highlights: {", ".join(campaign["highlights"])}
-Value Proposition: {", ".join(campaign["value_proposition"])}
-Promotion: {campaign["promotion"]}
-Additional Notes: {campaign["additional_notes"]}"""
+Promotion: {campaign["promotion"]}"""
 
 
 def content_agent(state: MarketingState) -> dict:
@@ -31,11 +28,19 @@ def content_agent(state: MarketingState) -> dict:
 
     campaign_details = f"""Campaign Length: {campaign["campaign_length"]} {campaign["campaign_unit"]}
 Posts Per Week: {campaign["posts_per_week"]}"""
+    expected_posts_count = campaign["campaign_length"] * campaign["posts_per_week"]
+    post_count_instruction = (
+        f"POST COUNT REQUIREMENT:\n"
+        f"Generate EXACTLY {expected_posts_count} posts. Not {expected_posts_count - 1}, "
+        f"not {expected_posts_count + 1} — exactly {expected_posts_count} posts, no more, "
+        f"no less."
+    )
 
     prompt = CONTENT_AGENT_PROMPT.format(
         insights=insights,
         offer_details=offer_details,
         campaign_details=campaign_details,
+        post_count_instruction=post_count_instruction,
     )
 
     # --- Human-in-the-loop: fold in feedback from a previous review round ---
@@ -54,6 +59,35 @@ that was already working well; change only what the feedback asks you to change.
 
     if result is not None:
         content_plan = result.model_dump()
+        posts = content_plan.get("posts", [])
+
+        if len(posts) > expected_posts_count:
+            content_plan["posts"] = posts[:expected_posts_count]
+        elif len(posts) < expected_posts_count:
+            retry_prompt = (
+                f"{prompt}\n\nPOST COUNT FIX:\n"
+                f"Your previous attempt returned {len(posts)} posts instead of the required "
+                f"{expected_posts_count}. Generate exactly {expected_posts_count} posts this time."
+            )
+            retry_result, retry_error_type, retry_raw_error = call_structured_llm_with_retry(
+                structured_llm,
+                retry_prompt,
+            )
+            if retry_result is not None:
+                content_plan = retry_result.model_dump()
+                retry_posts = content_plan.get("posts", [])
+                if len(retry_posts) > expected_posts_count:
+                    content_plan["posts"] = retry_posts[:expected_posts_count]
+                elif len(retry_posts) < expected_posts_count:
+                    content_plan["error_type"] = "post_count_mismatch"
+                    content_plan["error"] = (
+                        f"Expected {expected_posts_count} posts but received {len(retry_posts)}."
+                    )
+            else:
+                content_plan["error_type"] = "post_count_mismatch"
+                content_plan["error"] = (
+                    f"Expected {expected_posts_count} posts but received {len(posts)}."
+                )
     else:
         content_plan = {
             "campaign_summary": "",

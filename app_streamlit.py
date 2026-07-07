@@ -1,23 +1,3 @@
-"""
-MarketPulse - Streamlit UI
-
-Screens:
-  1. Setup screen        - upload Facebook JSON export + fill in campaign details
-  2. Loading / progress  - shows which pipeline stage is currently running
-  3. Human review        - approve / regenerate the whole plan or a single post
-  4. Final approved plan - view + download the approved content plan
-
-State management notes:
-  - Streamlit reruns the whole script on every interaction, so everything that
-    must survive between reruns (the graph result, the interrupt payload, the
-    thread_id, local "approved" badges, etc.) lives in st.session_state.
-  - Each browser session gets its own thread_id (a fresh uuid4 generated when
-    a campaign is started), so the LangGraph MemorySaver checkpointer keeps
-    every user's paused run completely separate.
-  - A "processing" flag disables all action buttons while a graph call
-    (which invokes an LLM) is in flight, to prevent double-submission.
-"""
-
 import json
 import uuid
 
@@ -141,20 +121,7 @@ def render_setup_screen():
         title = st.text_input("Title", placeholder="e.g. Summer Sale Launch")
         description = st.text_area("Description", placeholder="What is this campaign about?")
         target_audience = st.text_area("Target Audience", placeholder="Who is this campaign for?")
-
-        highlights_text = st.text_area(
-            "Highlights",
-            placeholder="One highlight per line",
-            help="Each line becomes one highlight.",
-        )
-        value_proposition_text = st.text_area(
-            "Value Proposition",
-            placeholder="One value proposition per line",
-            help="Each line becomes one value proposition.",
-        )
-
         promotion = st.text_input("Promotion", placeholder="e.g. Limited-time discount, giveaway, etc.")
-        additional_notes = st.text_area("Additional Notes", placeholder="Anything else the writer should know")
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -187,9 +154,6 @@ def render_setup_screen():
         st.error("Please give the campaign a title.")
         return
 
-    highlights = [line.strip() for line in highlights_text.splitlines() if line.strip()]
-    value_proposition = [line.strip() for line in value_proposition_text.splitlines() if line.strip()]
-
     initial_state = {
         "raw_data": facebook_json,
         "dataframe": [],
@@ -198,10 +162,7 @@ def render_setup_screen():
             "title": title,
             "description": description,
             "target_audience": target_audience,
-            "highlights": highlights,
-            "value_proposition": value_proposition,
             "promotion": promotion,
-            "additional_notes": additional_notes,
             "campaign_length": int(campaign_length),
             "campaign_unit": campaign_unit,
             "posts_per_week": int(posts_per_week),

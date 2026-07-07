@@ -15,10 +15,7 @@ class CampaignDetails(TypedDict):
     title: str
     description: str
     target_audience: str
-    highlights: list[str]
-    value_proposition: list[str]
     promotion: str
-    additional_notes: str
     campaign_length: int
     campaign_unit: str
     posts_per_week: int

@@ -103,8 +103,8 @@ marketpulse/
 ## Using the app
 
 - **Setup screen** - upload the Facebook JSON export and fill in the campaign
-  form (title, description, target audience, highlights, value proposition,
-  promotion, additional notes, campaign length/unit, posts per week).
+  form (title, description, target audience, promotion, campaign length/unit,
+  posts per week).
 - **Pipeline progress** - while the Data, Insight, and Content agents run, the
   app shows which stage is currently active.
 - **Review screen** - if generation failed, a warning banner explains why and

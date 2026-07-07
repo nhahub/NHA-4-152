@@ -75,8 +75,8 @@ Guidelines:
 - Base your writing style, hooks, keywords, and posting times on the marketing insights provided.
   Do not ignore them or default to generic advertising style.
 - Ground every post in the specific campaign details given (its own title, description, audience,
-  highlights, value proposition, promotion, and notes). Do not invent facts, features, or claims
-  that were not provided.
+  promotion, and campaign context). Do not invent facts, features, or claims that were not
+  provided.
 - Create Facebook posts according to the schedule requested by the user.
 - Every post should have a different objective (awareness, value, social proof, urgency, enrollment,
   FAQ, etc.), and no two posts should share the same objective unless the campaign length requires it.
@@ -90,7 +90,7 @@ Guidelines:
   in the insights. If the insights don't support a strong timing pattern, use reasonable general
   best practice instead and note that assumption.
 - Distribute the posts evenly across the requested campaign duration.
-- Adapt the number of posts to the campaign duration if an exact number wasn't specified.
+{post_count_instruction}
 
 For every scheduled post, return an object with exactly these fields:
 - day

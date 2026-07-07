@@ -1,0 +1,8 @@
+"Title": "Python for Data Science Bootcamp"
+"Description": "An intensive online training program designed to take participants from beginner to advanced levels in Python programming and data analysis. The course includes live sessions, continuous guidance, hands-on tasks, and regular follow-up to ensure steady progress and practical skill development.Target Audience= Computer Science and Engineering graduates and students interested in Data Science"
+"Target Audience": "Computer Science and Engineering graduates and students interested in Data Science"
+"Promotion": "20% Discount for the First 50 Registered Individuals"
+"campaign_length": 2
+"campaign_unit": "week"
+"posts_per_week": 3
+       
