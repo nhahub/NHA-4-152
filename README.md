@@ -126,3 +126,33 @@ local testing. It follows the same shape the Data Agent expects: each post has
 `comments.summary.total_count`, `shares.count`, and an `insights.data` array
 containing `post_impressions_fan` and `post_clicks` values. Replace it with a
 real export, or upload one directly in the app's setup screen.
+
+## Testing
+
+This repository includes a comprehensive pytest suite under the `tests/`
+directory and a `pytest.ini` file configured to import project modules from the
+repository root. Tests are offline by default: all LLM/network calls are mocked
+unless a test is explicitly marked `live`.
+
+- Run the full test suite:
+
+```bash
+pytest -q
+```
+
+- Run a single test file:
+
+```bash
+pytest tests/test_data_agent.py -q
+```
+
+- Run only opt-in live tests (requires real API keys and `RUN_LIVE_TESTS=1`):
+
+```bash
+RUN_LIVE_TESTS=1 pytest -q -m live
+```
+
+- Notes:
+   - The Streamlit smoke test uses `streamlit.testing.v1` and will be skipped
+      if that package isn't available.
+   - Live tests are skipped by default to prevent accidental network calls in CI.

@@ -114,9 +114,6 @@ that was already working well; change only what the feedback asks you to change.
 
 
 def content_agent_single_post(state: MarketingState) -> dict:
-    llm = get_llm("content", temperature=0.8)
-    structured_llm = llm.with_structured_output(PostItem)
-
     campaign = state["campaign_details"]
     content_plan = state["content_plan"]
     target_id = state.get("target_post_id")
@@ -128,6 +125,9 @@ def content_agent_single_post(state: MarketingState) -> dict:
     if target_post is None:
         # nothing to do, target_post_id was invalid - just go back to review
         return {"human_feedback": "", "target_post_id": None}
+
+    llm = get_llm("content", temperature=0.8)
+    structured_llm = llm.with_structured_output(PostItem)
 
     other_posts_summary = "\n".join(
         f"- ({p['objective']}) {p['post_content'][:80]}..."
