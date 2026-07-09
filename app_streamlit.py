@@ -326,6 +326,27 @@ def render_review_screen():
 
 
 # ---------------------------------------------------------------------------
+# Export helpers
+# ---------------------------------------------------------------------------
+
+def build_user_export(state):
+    content_plan = state.get("content_plan", {})
+    return {
+        "campaign_summary": content_plan.get("campaign_summary", ""),
+        "posts": [
+            {
+                "day": post.get("day"),
+                "suggested_time": post.get("suggested_time"),
+                "objective": post.get("objective"),
+                "post_content": post.get("post_content"),
+                "reasoning": post.get("reasoning"),
+            }
+            for post in content_plan.get("posts", [])
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
 # Screen 4: Final approved plan
 # ---------------------------------------------------------------------------
 
@@ -350,17 +371,11 @@ def render_final_screen():
 
     st.divider()
 
-    download_payload = {
-        "insights": state_values.get("insights", ""),
-        "content_plan": content_plan,
-        "feedback_history": state_values.get("feedback_history", []),
-    }
-
     col1, col2 = st.columns(2)
     with col1:
         st.download_button(
             "Download JSON",
-            data=json.dumps(download_payload, ensure_ascii=False, indent=2),
+            data=json.dumps(build_user_export(state_values), ensure_ascii=False, indent=2),
             file_name="marketpulse_content_plan.json",
             mime="application/json",
             use_container_width=True,
